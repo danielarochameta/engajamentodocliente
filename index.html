@@ -22,6 +22,8 @@ body{font-family:'Noto Sans',sans-serif;background:#F0F4F8;color:#1a2332}
 .big-numbers{display:grid;grid-template-columns:repeat(9,1fr);gap:12px;margin-bottom:28px}
 .bn-card{background:linear-gradient(135deg,#0D2B5E,#1248A0);border-radius:12px;padding:18px 10px;text-align:center;color:#FFF;box-shadow:0 4px 16px rgba(18,72,160,.25);transition:transform .15s;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:90px}
 .bn-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(18,72,160,.35)}
+.bn-prospect{background:linear-gradient(135deg,#1A3F7A,#1E5BB8)}
+.bn-financial{background:linear-gradient(135deg,#0D2B5E,#1248A0)}
 .bn-card .value{font-size:20px;font-weight:800;white-space:nowrap;letter-spacing:-0.3px}
 .bn-card .label{font-size:9.5px;font-weight:500;opacity:.85;margin-top:4px;text-transform:uppercase;letter-spacing:.3px;line-height:1.3}
 
@@ -103,10 +105,14 @@ body{font-family:'Noto Sans',sans-serif;background:#F0F4F8;color:#1a2332}
 .expand-btn:hover{border-color:#1248A0;color:#1248A0;background:#EFF6FF}
 .expand-btn.expanded{background:#1248A0;color:#FFF;border-color:#1248A0}
 
-/* Edit mode */
-.edit-toggle{position:fixed;bottom:20px;right:20px;width:36px;height:36px;border-radius:50%;background:#0D2B5E;color:#FFF;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);transition:all .2s;z-index:100;opacity:.5}
-.edit-toggle:hover{opacity:1;transform:scale(1.1)}
-[contenteditable=true]{outline:2px dashed #3B82F6;outline-offset:2px;border-radius:3px}
+/* Excel-style filter dropdown */
+.col-filter-wrap{position:relative;display:inline-block;width:100%}
+.col-filter{width:100%;box-sizing:border-box}
+.col-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#FFF;border:1px solid #CBD5E1;border-radius:6px;max-height:180px;overflow-y:auto;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.12);margin-top:2px}
+.col-dropdown.open{display:block}
+.col-dropdown label{display:flex;align-items:center;gap:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-weight:400;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.col-dropdown label:hover{background:#F1F5F9}
+.col-dropdown input[type=checkbox]{accent-color:#1248A0;width:14px;height:14px;flex-shrink:0}
 
 /* Consulta Panel */
 .chat-toggle{position:fixed;bottom:20px;right:66px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#1248A0,#2563EB);color:#FFF;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(18,72,160,.4);transition:all .2s;z-index:100;opacity:1}
@@ -137,7 +143,7 @@ body{font-family:'Noto Sans',sans-serif;background:#F0F4F8;color:#1a2332}
 
 @media(max-width:1200px){.big-numbers{grid-template-columns:repeat(5,1fr)}.cards-grid{grid-template-columns:1fr}.cards-grid-3{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){.main{padding:16px}.header{padding:16px}.big-numbers{grid-template-columns:repeat(3,1fr)}.mini-stats{grid-template-columns:repeat(2,1fr)}.chat-panel{width:calc(100vw - 32px);right:16px}}
-@media print{body{background:#fff}.filters-bar,.edit-toggle,.chat-toggle,.chat-panel{display:none}.card,.bn-card{box-shadow:none;border:1px solid #E2E8F0}}
+@media print{body{background:#fff}.filters-bar,.chat-toggle,.chat-panel{display:none}.card,.bn-card{box-shadow:none;border:1px solid #E2E8F0}}
 </style>
 </head>
 <body>
@@ -156,44 +162,44 @@ body{font-family:'Noto Sans',sans-serif;background:#F0F4F8;color:#1a2332}
   <button class="filter-btn active" onclick="setFilter('all',this)">Q1 2026</button>
   <button class="filter-btn" onclick="setFilter('01',this)">Janeiro</button>
   <button class="filter-btn" onclick="setFilter('02',this)">Fevereiro</button>
-  <button class="filter-btn" onclick="setFilter('03',this)">Marco</button>
+  <button class="filter-btn" onclick="setFilter('03',this)">Mar&#xE7;o</button>
 </div>
 
 <div class="main">
   <div class="big-numbers" id="bigNumbers">
-    <div class="bn-card"><div class="value" id="bn-leads">--</div><div class="label">Leads Trabalhados</div></div>
-    <div class="bn-card"><div class="value" id="bn-atividades">--</div><div class="label">Atividades Realizadas</div></div>
-    <div class="bn-card"><div class="value" id="bn-sals">--</div><div class="label">Leads Convertidos (SALs)</div></div>
-    <div class="bn-card"><div class="value" id="bn-reunioes">--</div><div class="label">Reunioes Realizadas</div></div>
-    <div class="bn-card"><div class="value" id="bn-opps">--</div><div class="label">Opps em Aberto</div></div>
-    <div class="bn-card"><div class="value" id="bn-receita-acv">--</div><div class="label">Receita ACV Ganhas</div></div>
-    <div class="bn-card"><div class="value" id="bn-margem-acv">--</div><div class="label">Margem ACV Ganhas</div></div>
-    <div class="bn-card"><div class="value" id="bn-receita-tcv">--</div><div class="label">Receita TCV Ganhas</div></div>
-    <div class="bn-card"><div class="value" id="bn-margem-tcv">--</div><div class="label">Margem TCV Ganhas</div></div>
+    <div class="bn-card bn-prospect"><div class="value" id="bn-leads">--</div><div class="label">Leads Trabalhados</div></div>
+    <div class="bn-card bn-prospect"><div class="value" id="bn-atividades">--</div><div class="label">Atividades Realizadas</div></div>
+    <div class="bn-card bn-prospect"><div class="value" id="bn-sals">--</div><div class="label">Leads Convertidos (SALs)</div></div>
+    <div class="bn-card bn-prospect"><div class="value" id="bn-reunioes">--</div><div class="label">Reuni&#xF5;es Realizadas</div></div>
+    <div class="bn-card bn-prospect"><div class="value" id="bn-opps">--</div><div class="label">Opps em Aberto</div></div>
+    <div class="bn-card bn-financial"><div class="value" id="bn-receita-acv">--</div><div class="label">Receita/ACV Ganhas 2026</div></div>
+    <div class="bn-card bn-financial"><div class="value" id="bn-margem-acv">--</div><div class="label">Margem/ACV Ganhas 2026</div></div>
+    <div class="bn-card bn-financial"><div class="value" id="bn-receita-tcv">--</div><div class="label">Receita/TCV Ganhas 2026</div></div>
+    <div class="bn-card bn-financial"><div class="value" id="bn-margem-tcv">--</div><div class="label">Margem/TCV Ganhas 2026</div></div>
   </div>
 
   <!-- PERFORMANCE -->
   <div class="section">
-    <div class="section-title">Performance <span class="section-badge">SALs e Reunioes</span></div>
+    <div class="section-title">Performance <span class="section-badge">Sales Accepted Leads & Reuni&#xF5;es Realizadas</span></div>
     <div class="cards-grid">
-      <div class="card"><div class="card-title">Cargo dos Leads (SALs)</div><div id="chart-cargo"></div></div>
-      <div class="card"><div class="card-title">Segmentos (SALs)</div><div id="chart-segmento"></div></div>
-      <div class="card card-full"><div class="card-title">Distribuicao por Estado e Regiao</div><div id="chart-mapa"></div></div>
-      <div class="card"><div class="card-title">Ritmos Convertidos</div><div id="chart-ritmos" class="bar-chart"></div></div>
-      <div class="card"><div class="card-title">SALs e Reunioes por Mes</div><div id="chart-sals-reunioes-mes"></div></div>
+      <div class="card"><div class="card-title">Cargo dos Leads Convertidos</div><div id="chart-cargo"></div></div>
+      <div class="card"><div class="card-title">Segmentos de Neg&#xF3;cio</div><div id="chart-segmento"></div></div>
+      <div class="card card-full"><div class="card-title">Distribui&#xE7;&#xE3;o por estado e regi&#xE3;o</div><div id="chart-mapa"></div></div>
+      <div class="card"><div class="card-title">Campanhas Convertidas</div><div id="chart-ritmos" class="bar-chart"></div></div>
+      <div class="card"><div class="card-title">Sales Accepted Leads e Reuni&#xF5;es realizadas/m&#xEA;s</div><div id="chart-sals-reunioes-mes"></div></div>
     </div>
   </div>
 
   <!-- ATIVIDADES -->
   <div class="section">
-    <div class="section-title">Atividades <span class="section-badge">Engajamento</span></div>
+    <div class="section-title">Atividades <span class="section-badge">Desempenho e Engajamento</span></div>
     <div id="ativ-mini-stats" class="mini-stats"></div>
     <div class="cards-grid">
-      <div class="card"><div class="card-title">Atividades + E-mails por Mes</div><div id="chart-ativ-mes"></div></div>
-      <div class="card"><div class="card-title">Leads Perdidos - Motivo de Perda</div><div id="chart-motivo-perda"></div></div>
+      <div class="card"><div class="card-title">Volume de atividades/m&#xEA;s</div><div id="chart-ativ-mes"></div></div>
+      <div class="card"><div class="card-title">Motivos de perda</div><div id="chart-motivo-perda"></div></div>
     </div>
     <div class="cards-grid" style="margin-top:16px">
-      <div class="card"><div class="card-title">Taxa de Conversao</div><div id="taxa-conversao"></div></div>
+      <div class="card"><div class="card-title">Taxa de Convers&#xE3;o</div><div id="taxa-conversao"></div></div>
     </div>
   </div>
 
@@ -204,9 +210,9 @@ body{font-family:'Noto Sans',sans-serif;background:#F0F4F8;color:#1a2332}
     <div class="cards-grid-3">
       <div class="card"><div class="card-title">Por Fase</div><div id="chart-fase"></div></div>
       <div class="card"><div class="card-title">Por Growth Unit</div><div id="chart-gu"></div></div>
-      <div class="card"><div class="card-title">Por Servico</div><div id="chart-servico"></div></div>
+      <div class="card"><div class="card-title">Por solu&#xE7;&#xE3;o</div><div id="chart-servico"></div></div>
       <div class="card"><div class="card-title">Por HUB</div><div id="chart-hub"></div></div>
-      <div class="card"><div class="card-title">Forecast e Prioridade</div><div id="opps-detail"></div></div>
+      <div class="card"><div class="card-title">Prioridade & Forecast</div><div id="opps-detail"></div></div>
       <div class="card"><div class="card-title">Ganhas 2026 - Resumo</div><div id="opps-ganhas-summary"></div></div>
     </div>
   </div>
@@ -237,7 +243,6 @@ body{font-family:'Noto Sans',sans-serif;background:#F0F4F8;color:#1a2332}
 <button class="chat-toggle" onclick="toggleChat()" title="Perguntar sobre os dados"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
 
 <!-- Edit toggle -->
-<button class="edit-toggle" onclick="toggleEdit()" title="Editar textos do dashboard">&#9998;</button>
 
 <script>
 const DATA={
@@ -253,7 +258,6 @@ const DATA={
 };
 
 let currentFilter='all';
-let editMode=false;
 
 // Blue palette only
 const PIE_BLUES=['#0A1628','#0D2B5E','#1248A0','#1E40AF','#2563EB','#3B82F6','#60A5FA','#93C5FD','#BFDBFE','#1E3A5F','#1D4ED8','#0284C7','#0369A1','#075985','#164E63','#155E75'];
@@ -290,6 +294,37 @@ function renderPieChart(id,data){
     return`<div class="pie-legend-item"><div class="pie-legend-dot" style="background:${PIE_BLUES[i%PIE_BLUES.length]}"></div><span style="flex:1">${d[0]}</span><span class="pie-legend-val">${d[1]} (${pct}%)</span></div>`;
   }).join('');
   el.innerHTML=`<div class="pie-container"><svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${paths}<text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="16" font-weight="800" fill="#0D2B5E">${total}</text></svg><div class="pie-legend">${legend}</div></div>`;
+}
+
+function renderSegmentChart(id,data){
+  const el=document.getElementById(id);if(!el)return;
+  const total=data.reduce((s,d)=>s+d[1],0);
+  if(total===0){el.innerHTML='<p style="color:#94A3B8;text-align:center;padding:20px">Sem dados</p>';return}
+  const ICO={
+    'Agroneg\u00f3cio':'\u{1F33E}','Bens de consumo':'\u{1F6D2}','Com\u00e9rcio e Varejo':'\u{1F3EA}',
+    'Constru\u00e7\u00e3o e imobili\u00e1rio':'\u{1F3D7}','Educa\u00e7\u00e3o':'\u{1F393}','Energia, \u00d3leo e g\u00e1s':'\u26A1',
+    'Extra\u00e7\u00e3o Natural':'\u26CF','Farmac\u00eautico':'\u{1F48A}','Ind\u00fastria Aliment\u00edcia':'\u{1F35E}',
+    'Ind\u00fastria Automotiva':'\u{1F697}','Ind\u00fastria Manufatura':'\u{1F3ED}','Ind\u00fastria Qu\u00edmica':'\u2697',
+    'Ind\u00fastria e Varejo':'\u{1F3EC}','Log\u00edstica':'\u{1F69A}','M\u00eddia/Comunica\u00e7\u00e3o':'\u{1F4F0}',
+    'Saneamento':'\u{1F4A7}','Sa\u00fade':'\u{1F3E5}','Servi\u00e7os financeiros':'\u{1F4B3}',
+    'Servi\u00e7os profissionais':'\u{1F4BC}','Tecnologia':'\u{1F4BB}','Telecomunica\u00e7\u00f5es':'\u{1F4F6}'
+  };
+  const sorted=data.sort((a,b)=>b[1]-a[1]);
+  const maxVal=sorted[0][1];
+  const rows=sorted.map((d,i)=>{
+    const pct=((d[1]/total)*100).toFixed(0);
+    const barW=Math.max((d[1]/maxVal)*100,8);
+    const ico=ICO[d[0]]||'\u{1F4C8}';
+    const color=PIE_BLUES[i%PIE_BLUES.length];
+    return`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F1F5F9">
+      <div style="width:28px;height:28px;border-radius:8px;background:${color}15;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${ico}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;font-weight:600;color:#0D2B5E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${d[0]}">${d[0]}</span><span style="font-size:11px;font-weight:700;color:${color};flex-shrink:0;margin-left:8px">${d[1]} (${pct}%)</span></div>
+        <div style="height:6px;background:#F1F5F9;border-radius:3px;overflow:hidden"><div style="height:100%;width:${barW}%;background:${color};border-radius:3px;transition:width .3s"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div style="max-height:320px;overflow-y:auto;padding-right:4px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #E2E8F0"><span style="font-size:22px;font-weight:800;color:#0D2B5E">${total}</span><span style="font-size:11px;color:#64748B">leads convertidos</span></div>${rows}</div>`;
 }
 
 function renderLineChart(id,labels,datasets){
@@ -397,7 +432,7 @@ function renderBrazilMap(id,estadoC,regiaoC){
 
   const regSummary=Object.entries(regiaoC).sort((a,b)=>b[1]-a[1]).map(([r,v])=>`<div class="region-row"><div class="region-dot" style="background:${regiaoColors[r]||'#93C5FD'}"></div><span class="region-name">${r}</span><span class="region-val">${v}</span></div>`).join('');
 
-  el.innerHTML=`<div class="brazil-map-container"><div class="map-wrapper">${svg}</div><div class="map-legend"><div style="font-size:13px;font-weight:700;color:#0D2B5E;margin-bottom:12px">POR REGIAO</div><div class="region-summary">${regSummary}</div><div style="margin-top:16px;font-size:13px;font-weight:700;color:#0D2B5E;margin-bottom:8px">POR ESTADO</div>${Object.entries(estadoC).sort((a,b)=>b[1]-a[1]).map(([s,v])=>`<div class="region-row"><span class="region-name" style="font-weight:600">${s}</span><span class="region-val">${v}</span></div>`).join('')}</div></div>`;
+  el.innerHTML=`<div class="brazil-map-container"><div class="map-wrapper">${svg}</div><div class="map-legend"><div style="font-size:13px;font-weight:700;color:#0D2B5E;margin-bottom:12px">POR REGI&#xC3;O</div><div class="region-summary">${regSummary}</div><div style="margin-top:16px;font-size:13px;font-weight:700;color:#0D2B5E;margin-bottom:8px">POR ESTADO</div>${Object.entries(estadoC).sort((a,b)=>b[1]-a[1]).map(([s,v])=>`<div class="region-row"><span class="region-name" style="font-weight:600">${s}</span><span class="region-val">${v}</span></div>`).join('')}</div></div>`;
 }
 
 function toggleExpand(btn,scrollId){
@@ -409,18 +444,73 @@ function toggleExpand(btn,scrollId){
   }
 }
 
-function toggleEdit(){
-  editMode=!editMode;
-  document.querySelectorAll('.card-title,.detail-title,.bn-card .label,.section-title').forEach(el=>{
-    el.contentEditable=editMode?'true':'false';
+
+function buildFilterHeader(tableId,cols){
+  return cols.map((c,ci)=>{
+    return`<th><div style="margin-bottom:4px">${c}</div><div class="col-filter-wrap"><input class="col-filter" placeholder="Filtrar..." oninput="applyColumnFilters('${tableId}')" onfocus="showColDropdown('${tableId}',${ci})"><div class="col-dropdown" id="dd-${tableId}-${ci}"></div></div></th>`;
+  }).join('');
+}
+
+function showColDropdown(tableId,colIdx){
+  // Close all other dropdowns first
+  document.querySelectorAll('.col-dropdown.open').forEach(d=>d.classList.remove('open'));
+  const table=document.getElementById(tableId);if(!table)return;
+  const dd=document.getElementById('dd-'+tableId+'-'+colIdx);if(!dd)return;
+  // Collect unique values from this column
+  const vals=new Set();
+  table.querySelectorAll('tbody tr').forEach(row=>{
+    const cell=row.cells[colIdx];
+    if(cell){const t=cell.textContent.trim();if(t)vals.add(t)}
   });
-  document.querySelector('.edit-toggle').style.background=editMode?'#2563EB':'#0D2B5E';
+  const sorted=[...vals].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  if(sorted.length===0)return;
+  // Get currently checked values
+  const checked=dd.getAttribute('data-checked');
+  const checkedSet=checked?new Set(checked.split('||')):new Set();
+  dd.innerHTML=`<label style="border-bottom:1px solid #E2E8F0;font-weight:600;color:#0D2B5E"><input type="checkbox" ${checkedSet.size===0?'checked':''} onchange="toggleAllCol('${tableId}',${colIdx},this.checked)"> Selecionar todos</label>`+sorted.map(v=>{
+    const esc=v.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+    const isChecked=checkedSet.size===0||checkedSet.has(v);
+    return`<label><input type="checkbox" value="${esc}" ${isChecked?'checked':''} onchange="updateColFilter('${tableId}',${colIdx})"> ${v.length>35?v.substring(0,35)+'...':v}</label>`;
+  }).join('');
+  dd.classList.add('open');
+}
+
+function toggleAllCol(tableId,colIdx,checked){
+  const dd=document.getElementById('dd-'+tableId+'-'+colIdx);if(!dd)return;
+  dd.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=checked);
+  updateColFilter(tableId,colIdx);
+}
+
+function updateColFilter(tableId,colIdx){
+  const dd=document.getElementById('dd-'+tableId+'-'+colIdx);if(!dd)return;
+  const cbs=dd.querySelectorAll('input[type=checkbox][value]');
+  const allCbs=[...cbs];
+  const checked=allCbs.filter(cb=>cb.checked).map(cb=>cb.value);
+  const selectAll=dd.querySelector('input[type=checkbox]:not([value])');
+  if(checked.length===allCbs.length){
+    dd.setAttribute('data-checked','');
+    if(selectAll)selectAll.checked=true;
+  }else{
+    dd.setAttribute('data-checked',checked.join('||'));
+    if(selectAll)selectAll.checked=false;
+  }
+  applyColumnFilters(tableId);
 }
 
 function applyColumnFilters(tableId){
   const table=document.getElementById(tableId);if(!table)return;
   const filters=table.querySelectorAll('.col-filter');
+  const ths=table.querySelectorAll('thead th');
   const rows=table.querySelectorAll('tbody tr');
+  // Build dropdown checked sets per column
+  const ddSets=[];
+  ths.forEach((_,i)=>{
+    const dd=document.getElementById('dd-'+tableId+'-'+i);
+    if(dd){
+      const checked=dd.getAttribute('data-checked');
+      ddSets[i]=checked?new Set(checked.split('||')):null; // null means all selected
+    }else{ddSets[i]=null}
+  });
   rows.forEach(row=>{
     let show=true;
     filters.forEach((f,i)=>{
@@ -430,9 +520,25 @@ function applyColumnFilters(tableId){
         if(cell&&!cell.textContent.toLowerCase().includes(val))show=false;
       }
     });
+    // Also check dropdown filters
+    if(show){
+      for(let i=0;i<row.cells.length;i++){
+        if(ddSets[i]&&ddSets[i].size>0){
+          const cellVal=row.cells[i]?row.cells[i].textContent.trim():'';
+          if(!ddSets[i].has(cellVal)){show=false;break}
+        }
+      }
+    }
     row.style.display=show?'':'none';
   });
 }
+
+// Close dropdowns when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.col-filter-wrap')){
+    document.querySelectorAll('.col-dropdown.open').forEach(d=>d.classList.remove('open'));
+  }
+});
 
 function setFilter(f,btn){
   currentFilter=f;
@@ -497,7 +603,7 @@ function render(){
   renderPieChart('chart-cargo',Object.entries(cargoCounts).sort((a,b)=>b[1]-a[1]));
 
   // PIE: Segmento
-  renderPieChart('chart-segmento',countBy(secSals,'segmento'));
+  renderSegmentChart('chart-segmento',countBy(secSals,'segmento'));
 
   // BRAZIL MAP
   const estadoCounts={};
@@ -506,7 +612,7 @@ function render(){
   secSals.forEach(d=>{const r=classifyRegiao(d.estado);if(r)regiaoCounts[r]=(regiaoCounts[r]||0)+1});
   renderBrazilMap('chart-mapa',estadoCounts,regiaoCounts);
 
-  // Ritmos
+  // Campanhas
   renderBarChart('chart-ritmos',countBy(secSals,'ritmo'));
 
   // LINE: SALs + Reunioes por mes (always show Jan-Mar)
@@ -566,9 +672,9 @@ function render(){
   document.getElementById('opps-detail').innerHTML=`
     <div style="text-align:center;padding:20px 0">
       <div style="display:flex;gap:24px;justify-content:center">
-        <div><div style="font-size:36px;font-weight:800;color:#1248A0">${forecast}</div><div style="font-size:11px;color:#64748B;margin-top:4px">FORECAST</div></div>
-        <div style="width:1px;background:#E2E8F0"></div>
         <div><div style="font-size:36px;font-weight:800;color:#0D2B5E">${prioridade}</div><div style="font-size:11px;color:#64748B;margin-top:4px">PRIORIDADE</div></div>
+        <div style="width:1px;background:#E2E8F0"></div>
+        <div><div style="font-size:36px;font-weight:800;color:#1248A0">${forecast}</div><div style="font-size:11px;color:#64748B;margin-top:4px">FORECAST</div></div>
       </div>
     </div>`;
 
@@ -580,23 +686,23 @@ function render(){
     <div class="metric-row"><span class="metric-label">Margem ACV</span><span class="metric-value">${fmt(sumBy(secGanhas,'margem_acv'))}</span></div>`;
 
   // DETAIL TABLES with column filters
-  const fh=(cols)=>cols.map(c=>`<th>${c}<br><input class="col-filter" placeholder="Filtrar..." oninput="applyColumnFilters('${cols._tableId}')"></th>`).join('');
-
   // SALs table
-  const salsCols=['Nome','Cargo','Conta','Segmento','Estado','Ritmo','SDR','Competencia'];
+  const salsCols=['Nome','Cargo','Conta','Segmento','Estado','Campanha','SDR','Competencia'];
   document.getElementById('table-sals').innerHTML=`
-    <thead><tr>${salsCols.map(c=>`<th>${c}<br><input class="col-filter" placeholder="Filtrar..." oninput="applyColumnFilters('table-sals')"></th>`).join('')}</tr></thead>
-    <tbody>${secSals.map(d=>`<tr><td>${d.nome}</td><td>${d.cargo}</td><td>${d.conta}</td><td>${d.segmento}</td><td>${d.estado}</td><td><span class="tag tag-blue">${d.ritmo}</span></td><td>${d.sdr}</td><td>${d.competencia}</td></tr>`).join('')}</tbody>`;
+    <thead><tr>${buildFilterHeader('table-sals',salsCols)}</tr></thead>
+    <tbody>${secSals.map(d=>`<tr><td>${d.nome}</td><td>${d.cargo}</td><td>${d.conta}</td><td>${d.segmento}</td><td>${d.estado}</td><td><span class="tag tag-blue">${d.campanha||d.ritmo}</span></td><td>${d.sdr}</td><td>${d.competencia}</td></tr>`).join('')}</tbody>`;
 
   // Ganhas table
+  const ganhasCols=['Conta','Oportunidade','Growth Unit','Hub','Servico','Receita','Margem','Receita ACV','Margem ACV','Fechamento'];
   document.getElementById('table-ganhas').innerHTML=`
-    <thead><tr>${['Conta','Oportunidade','Growth Unit','Hub','Servico','Receita','Margem','Receita ACV','Margem ACV','Fechamento'].map(c=>`<th>${c}<br><input class="col-filter" placeholder="Filtrar..." oninput="applyColumnFilters('table-ganhas')"></th>`).join('')}</tr></thead>
+    <thead><tr>${buildFilterHeader('table-ganhas',ganhasCols)}</tr></thead>
     <tbody>${secGanhas.map(d=>`<tr><td>${d.conta}</td><td>${d.nome_opp}</td><td><span class="tag tag-blue">${d.growth_unit}</span></td><td>${d.hub}</td><td>${d.servico}</td><td style="text-align:right">${fmt(d.receita)}</td><td style="text-align:right">${fmt(d.margem)}</td><td style="text-align:right">${fmt(d.receita_acv)}</td><td style="text-align:right">${fmt(d.margem_acv)}</td><td>${d.data_fechamento}</td></tr>`).join('')}</tbody>`;
 
   // Reunioes table
+  const reunioesCols=['Data','Nome','Conta','Cargo','SDR','Campanha','Proprietario'];
   document.getElementById('table-reunioes').innerHTML=`
-    <thead><tr>${['Data','Nome','Conta','Cargo','SDR','Ritmo','Proprietario'].map(c=>`<th>${c}<br><input class="col-filter" placeholder="Filtrar..." oninput="applyColumnFilters('table-reunioes')"></th>`).join('')}</tr></thead>
-    <tbody>${secReunioes.map(d=>`<tr><td>${d.data}</td><td>${d.nome}</td><td>${d.conta}</td><td>${d.cargo}</td><td>${d.sdr}</td><td><span class="tag tag-blue">${d.ritmo}</span></td><td>${d.proprietario}</td></tr>`).join('')}</tbody>`;
+    <thead><tr>${buildFilterHeader('table-reunioes',reunioesCols)}</tr></thead>
+    <tbody>${secReunioes.map(d=>`<tr><td>${d.data}</td><td>${d.nome}</td><td>${d.conta}</td><td>${d.cargo}</td><td>${d.sdr}</td><td><span class="tag tag-blue">${d.campanha||d.ritmo}</span></td><td>${d.proprietario}</td></tr>`).join('')}</tbody>`;
 }
 
 render();
@@ -617,7 +723,7 @@ function showResult(html){
 }
 
 function buildPicklist(){
-  const mL={'01':'Janeiro','02':'Fevereiro','03':'Marco','04':'Abril'};
+  const mL={'01':'Janeiro','02':'Fevereiro','03':'Mar\u00e7o','04':'Abril'};
   const allM=['01','02','03','04'];
   const q1M=['01','02','03'];
   const cb=countBy,sb=sumBy;
@@ -679,21 +785,21 @@ function buildPicklist(){
         {label:'Total de SALs acumulado',fn:()=>`<strong>${DATA.sals.length} SALs</strong> (Total acumulado)`},
         {label:'SALs em Janeiro',fn:()=>`<strong>${salsByMonth('01')} SALs</strong> em Janeiro`},
         {label:'SALs em Fevereiro',fn:()=>`<strong>${salsByMonth('02')} SALs</strong> em Fevereiro`},
-        {label:'SALs em Marco',fn:()=>`<strong>${salsByMonth('03')} SALs</strong> em Marco`},
+        {label:'SALs em Mar\u00e7o',fn:()=>`<strong>${salsByMonth('03')} SALs</strong> em Mar\u00e7o`},
         {label:'SALs por segmento',fn:()=>'<strong>SALs por Segmento</strong><br><br>'+tbl(cb(DATA.sals,'segmento'))},
         {label:'SALs por estado',fn:()=>{
           const e={};DATA.sals.forEach(d=>{const s=(d.estado||'').toUpperCase();if(s&&s!=='NEW YORK')e[s]=(e[s]||0)+1});
           return'<strong>SALs por Estado</strong><br><br>'+tbl(Object.entries(e).sort((a,b)=>b[1]-a[1]));
         }},
-        {label:'SALs por regiao',fn:()=>{
+        {label:'SALs por regi\u00e3o',fn:()=>{
           const rg={};DATA.sals.forEach(d=>{const r=classifyRegiao(d.estado);if(r)rg[r]=(rg[r]||0)+1});
-          return'<strong>SALs por Regiao</strong><br><br>'+tbl(Object.entries(rg).sort((a,b)=>b[1]-a[1]));
+          return'<strong>SALs por Regi\u00e3o</strong><br><br>'+tbl(Object.entries(rg).sort((a,b)=>b[1]-a[1]));
         }},
         {label:'SALs por cargo (nivel hierarquico)',fn:()=>{
           const c={};DATA.sals.forEach(d=>{c[classifyCargo(d.cargo)]=(c[classifyCargo(d.cargo)]||0)+1});
           return'<strong>SALs por Cargo</strong><br><br>'+tbl(Object.entries(c).sort((a,b)=>b[1]-a[1]));
         }},
-        {label:'SALs por ritmo convertido',fn:()=>'<strong>SALs por Ritmo</strong><br><br>'+tbl(cb(DATA.sals,'ritmo'))},
+        {label:'SALs por campanha convertida',fn:()=>'<strong>SALs por Campanha</strong><br><br>'+tbl(cb(DATA.sals,'ritmo'))},
         {label:'SALs por proprietario/SDR',fn:()=>'<strong>SALs por SDR</strong><br><br>'+tbl(cb(DATA.sals,'sdr'))},
         {label:'Lista completa de SALs (nome, conta, cargo)',fn:()=>'<strong>Lista Completa de SALs</strong><br><br>'+DATA.sals.map(d=>`<div style="padding:3px 0;border-bottom:1px solid #F1F5F9;font-size:11px"><strong>${d.nome}</strong> - ${d.conta}<br><span style="color:#64748B">${d.cargo} | ${d.segmento} | ${d.estado}</span></div>`).join('')}
       ]
@@ -704,9 +810,9 @@ function buildPicklist(){
         {label:'Total de reunioes acumulado',fn:()=>`<strong>${DATA.reunioes.length} reunioes realizadas</strong> (Total acumulado)`},
         {label:'Reunioes em Janeiro',fn:()=>`<strong>${reunByMonth('01')} reunioes</strong> em Janeiro`},
         {label:'Reunioes em Fevereiro',fn:()=>`<strong>${reunByMonth('02')} reunioes</strong> em Fevereiro`},
-        {label:'Reunioes em Marco',fn:()=>`<strong>${reunByMonth('03')} reunioes</strong> em Marco`},
+        {label:'Reunioes em Mar\u00e7o',fn:()=>`<strong>${reunByMonth('03')} reunioes</strong> em Mar\u00e7o`},
         {label:'Reunioes por SDR',fn:()=>'<strong>Reunioes por SDR</strong><br><br>'+tbl(cb(DATA.reunioes,'sdr'))},
-        {label:'Reunioes por ritmo',fn:()=>'<strong>Reunioes por Ritmo</strong><br><br>'+tbl(cb(DATA.reunioes,'ritmo'))},
+        {label:'Reuni\u00f5es por campanha',fn:()=>'<strong>Reuni\u00f5es por Campanha</strong><br><br>'+tbl(cb(DATA.reunioes,'ritmo'))},
         {label:'Lista completa de reunioes',fn:()=>'<strong>Lista Completa de Reunioes</strong><br><br>'+DATA.reunioes.map(d=>`<div style="padding:3px 0;border-bottom:1px solid #F1F5F9;font-size:11px"><strong>${d.data}</strong> - ${d.nome} (${d.conta})<br><span style="color:#64748B">${d.cargo} | SDR: ${d.sdr}</span></div>`).join('')}
       ]
     },
@@ -720,7 +826,7 @@ function buildPicklist(){
         }},
         {label:'Atividades + e-mails em Janeiro',fn:()=>{const d=ativByMonth('01');return`<strong>Janeiro</strong><br><br>`+tbl([['Atividades',fmtN(d.ativ)],['E-mails',fmtN(d.emails)],['Total',fmtN(d.total)]])}},
         {label:'Atividades + e-mails em Fevereiro',fn:()=>{const d=ativByMonth('02');return`<strong>Fevereiro</strong><br><br>`+tbl([['Atividades',fmtN(d.ativ)],['E-mails',fmtN(d.emails)],['Total',fmtN(d.total)]])}},
-        {label:'Atividades + e-mails em Marco',fn:()=>{const d=ativByMonth('03');return`<strong>Marco</strong><br><br>`+tbl([['Atividades',fmtN(d.ativ)],['E-mails',fmtN(d.emails)],['Total',fmtN(d.total)]])}},
+        {label:'Atividades + e-mails em Mar\u00e7o',fn:()=>{const d=ativByMonth('03');return`<strong>Marco</strong><br><br>`+tbl([['Atividades',fmtN(d.ativ)],['E-mails',fmtN(d.emails)],['Total',fmtN(d.total)]])}},
         {label:'Evolucao mensal de atividades',fn:()=>{
           let r='<strong>Evolucao Mensal</strong><br><br>';
           q1M.forEach(m=>{const d=ativByMonth(m);r+=`<div style="padding:4px 0;border-bottom:1px solid #F1F5F9"><strong>${mL[m]}:</strong> ${fmtN(d.total)} (${fmtN(d.ativ)} ativ. + ${fmtN(d.emails)} emails)</div>`});
@@ -734,7 +840,7 @@ function buildPicklist(){
         {label:'Total de leads trabalhados',fn:()=>`<strong>${fmtN(DATA.leads_trab.length)} leads trabalhados</strong> (Total acumulado)`},
         {label:'Leads trabalhados em Janeiro',fn:()=>`<strong>${fmtN(leadsByMonth('01'))} leads</strong> em Janeiro`},
         {label:'Leads trabalhados em Fevereiro',fn:()=>`<strong>${fmtN(leadsByMonth('02'))} leads</strong> em Fevereiro`},
-        {label:'Leads trabalhados em Marco',fn:()=>`<strong>${fmtN(leadsByMonth('03'))} leads</strong> em Marco`},
+        {label:'Leads trabalhados em Mar\u00e7o',fn:()=>`<strong>${fmtN(leadsByMonth('03'))} leads</strong> em Mar\u00e7o`},
         {label:'Leads por status (Ativo, Perdido, Convertido...)',fn:()=>'<strong>Leads por Status</strong><br><br>'+tbl(cb(DATA.leads_trab,'status'))},
         {label:'Leads por proprietario',fn:()=>'<strong>Leads por Proprietario</strong><br><br>'+tbl(cb(DATA.leads_trab,'proprietario'))}
       ]
@@ -745,13 +851,13 @@ function buildPicklist(){
         {label:'Total de leads perdidos',fn:()=>`<strong>${fmtN(DATA.leads_perdidos.length)} leads perdidos</strong> (Total acumulado)`},
         {label:'Leads perdidos em Janeiro',fn:()=>`<strong>${fmtN(perdByMonth('01'))} leads perdidos</strong> em Janeiro`},
         {label:'Leads perdidos em Fevereiro',fn:()=>`<strong>${fmtN(perdByMonth('02'))} leads perdidos</strong> em Fevereiro`},
-        {label:'Leads perdidos em Marco',fn:()=>`<strong>${fmtN(perdByMonth('03'))} leads perdidos</strong> em Marco`},
+        {label:'Leads perdidos em Mar\u00e7o',fn:()=>`<strong>${fmtN(perdByMonth('03'))} leads perdidos</strong> em Mar\u00e7o`},
         {label:'Ranking de motivos de perda',fn:()=>{
           const m={};DATA.leads_perdidos.forEach(d=>{if(d.motivo)m[d.motivo]=(m[d.motivo]||0)+1});
           return'<strong>Motivos de Perda</strong><br><br>'+tbl(Object.entries(m).sort((a,b)=>b[1]-a[1]));
         }},
         {label:'Leads perdidos por proprietario',fn:()=>'<strong>Perdidos por Proprietario</strong><br><br>'+tbl(cb(DATA.leads_perdidos,'proprietario'))},
-        {label:'Leads perdidos por ritmo',fn:()=>'<strong>Perdidos por Ritmo</strong><br><br>'+tbl(cb(DATA.leads_perdidos,'ritmo'))}
+        {label:'Leads perdidos por campanha',fn:()=>'<strong>Perdidos por Campanha</strong><br><br>'+tbl(cb(DATA.leads_perdidos,'ritmo'))}
       ]
     },
     {
@@ -763,7 +869,7 @@ function buildPicklist(){
         }},
         {label:'Oportunidades por fase',fn:()=>'<strong>Por Fase</strong><br><br>'+tbl(cb(DATA.opps_aberto,'fase'))},
         {label:'Oportunidades por Growth Unit',fn:()=>'<strong>Por Growth Unit</strong><br><br>'+tbl(cb(DATA.opps_aberto,'growth_unit'))},
-        {label:'Oportunidades por servico',fn:()=>'<strong>Por Servico</strong><br><br>'+tbl(cb(DATA.opps_aberto,'servico'))},
+        {label:'Oportunidades por solu\u00e7\u00e3o',fn:()=>'<strong>Por Solu\u00e7\u00e3o</strong><br><br>'+tbl(cb(DATA.opps_aberto,'servico'))},
         {label:'Oportunidades por HUB',fn:()=>'<strong>Por HUB</strong><br><br>'+tbl(cb(DATA.opps_aberto,'hub'))},
         {label:'Oportunidades em forecast',fn:()=>{
           const fc=DATA.opps_aberto.filter(d=>d.forecast===1);
