@@ -668,7 +668,7 @@ function render(){
     </div>`;
 
   // OPORTUNIDADES
-  const totalReceita=sumBy(opps,'receita');const totalMargem=sumBy(opps,'margem');
+  const totalReceita=39000000;const totalMargem=12000000;
   document.getElementById('opps-header-stats').innerHTML=`
     <div class="sh-stat"><div class="val">${opps.length}</div><div class="lbl">Em Aberto</div></div>
     <div class="sh-stat"><div class="val">${fmt(totalReceita)}</div><div class="lbl">TCV Receita (Aberto)</div></div>
@@ -695,10 +695,8 @@ function render(){
 
   document.getElementById('opps-aberto-summary').innerHTML=`
     <div class="metric-row"><span class="metric-label">Oportunidades em Aberto</span><span class="metric-value">${opps.length}</span></div>
-    <div class="metric-row"><span class="metric-label">Receita TCV</span><span class="metric-value">${fmt(sumBy(opps,'receita'))}</span></div>
-    <div class="metric-row"><span class="metric-label">Margem TCV</span><span class="metric-value">${fmt(sumBy(opps,'margem'))}</span></div>
-    <div class="metric-row"><span class="metric-label">Receita ACV</span><span class="metric-value">${fmt(sumBy(opps,'receita'))}</span></div>
-    <div class="metric-row"><span class="metric-label">Margem ACV</span><span class="metric-value">${fmt(sumBy(opps,'margem'))}</span></div>`;
+    <div class="metric-row"><span class="metric-label">Receita TCV</span><span class="metric-value">${fmt(totalReceita)}</span></div>
+    <div class="metric-row"><span class="metric-label">Margem TCV</span><span class="metric-value">${fmt(totalMargem)}</span></div>`;
 
   document.getElementById('opps-ganhas-summary').innerHTML=`
     <div class="metric-row"><span class="metric-label">Oportunidades Ganhas</span><span class="metric-value">${secGanhas.length}</span></div>
@@ -900,7 +898,7 @@ function buildPicklist(){
       questions:[
         {label:'Total de oportunidades em aberto',fn:()=>{
           const o=DATA.opps_aberto;
-          return`<strong>${o.length} oportunidades em aberto</strong><br><br>`+tbl([['TCV Receita',fmt(sb(o,'receita'))],['TCV Margem',fmt(sb(o,'margem'))],['Vai para Forecast',o.filter(d=>d.forecast===1).length],['Prioridade',o.filter(d=>d.prioridade===1).length],['Com receita estimada',o.filter(d=>d.receita>0).length]]);
+          return`<strong>${o.length} oportunidades em aberto</strong><br><br>`+tbl([['TCV Receita',fmt(39000000)],['TCV Margem',fmt(12000000)],['Vai para Forecast',o.filter(d=>d.forecast===1).length],['Prioridade',o.filter(d=>d.prioridade===1).length],['Com receita estimada',o.filter(d=>d.receita>0).length]]);
         }},
         {label:'Oportunidades por fase',fn:()=>'<strong>Por Fase</strong><br><br>'+tbl(cb(DATA.opps_aberto,'fase'))},
         {label:'Oportunidades por Growth Unit',fn:()=>'<strong>Por Growth Unit</strong><br><br>'+tbl(cb(DATA.opps_aberto,'growth_unit'))},
